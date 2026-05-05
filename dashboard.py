@@ -20,18 +20,22 @@ max_date = df_day['date'].max()
 
 with st.sidebar:
     st.image("https://github.com/dicodingacademy/assets/raw/main/logo.png")
-
+    
     date_input = st.date_input(
         label='Rentang Waktu',
         min_value=min_date,
         max_value=max_date,
         value=[min_date, max_date]
     )
+    
+# Tambahkan filter musim
+season_options = ['Semua'] + list(df_day['season'].unique())
+selected_season = st.selectbox('Pilih Musim', season_options)
 
 start_date = pd.Timestamp(date_input[0])
 end_date = pd.Timestamp(date_input[1]) if len(date_input) > 1 else pd.Timestamp(max_date)
 
-# Filter dataframe
+# Filter berdasarkan tanggal
 df_filtered = df_day[
     (df_day['date'] >= start_date) &
     (df_day['date'] <= end_date)
@@ -41,6 +45,10 @@ df_hour_filtered = df_hour[
     (df_hour['date'] >= start_date) &
     (df_hour['date'] <= end_date)
 ]
+
+# Filter berdasarkan musim
+if selected_season != 'Semua':
+    df_filtered = df_filtered[df_filtered['season'] == selected_season]
 
 # =====================
 # JUDUL DASHBOARD
