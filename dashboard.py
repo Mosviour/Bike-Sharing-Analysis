@@ -41,6 +41,12 @@ selected_season = st.sidebar.selectbox('Pilih Musim', season_options)
 weather_options = ['Semua'] + list(df_day['weather_condition'].unique())
 selected_weather = st.sidebar.selectbox('Pilih Kondisi Cuaca', weather_options)
 
+if len(date_input) == 2:
+    start_date, end_date = date_input
+else:
+    start_date = date_input[0]
+    end_date = max_date
+
 # Terapkan filter ke dataframe
 df_filtered = df_day[
     (df_day['date'] >= pd.Timestamp(start_date)) &
