@@ -3,62 +3,54 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
+# =====================
+# LOAD DATA
+# =====================
 df_day = pd.read_csv('day_clean.csv')
 df_hour = pd.read_csv('hour_clean.csv')
-
 
 df_day['date'] = pd.to_datetime(df_day['date'])
 df_hour['date'] = pd.to_datetime(df_hour['date'])
 
-
-st.title('Bike Sharing Dashboard')
-st.markdown('Analisis data peminjaman sepeda periode 2011-2012')
-
-
-# SIDEBAR - FILTER INTERAKTIF
-st.sidebar.header('Filter Data')
-
-# Filter tanggal
+# =====================
+# SIDEBAR
+# =====================
 min_date = df_day['date'].min()
 max_date = df_day['date'].max()
 
 with st.sidebar:
     st.image("https://github.com/dicodingacademy/assets/raw/main/logo.png")
-    
-    start_date, end_date = st.date_input(
+
+    date_input = st.date_input(
         label='Rentang Waktu',
         min_value=min_date,
         max_value=max_date,
         value=[min_date, max_date]
     )
 
-# Filter musim
-season_options = ['Semua'] + list(df_day['season'].unique())
-selected_season = st.sidebar.selectbox('Pilih Musim', season_options)
+start_date = pd.Timestamp(date_input[0])
+end_date = pd.Timestamp(date_input[1]) if len(date_input) > 1 else pd.Timestamp(max_date)
 
-# Filter cuaca
-weather_options = ['Semua'] + list(df_day['weather_condition'].unique())
-selected_weather = st.sidebar.selectbox('Pilih Kondisi Cuaca', weather_options)
-
-if len(date_input) == 2:
-    start_date, end_date = date_input
-else:
-    start_date = date_input[0]
-    end_date = max_date
-
-# Terapkan filter ke dataframe
+# Filter dataframe
 df_filtered = df_day[
-    (df_day['date'] >= pd.Timestamp(start_date)) &
-    (df_day['date'] <= pd.Timestamp(end_date))
+    (df_day['date'] >= start_date) &
+    (df_day['date'] <= end_date)
 ]
 
 df_hour_filtered = df_hour[
-    (df_hour['date'] >= pd.Timestamp(start_date)) &
-    (df_hour['date'] <= pd.Timestamp(end_date))
+    (df_hour['date'] >= start_date) &
+    (df_hour['date'] <= end_date)
 ]
 
+# =====================
+# JUDUL DASHBOARD
+# =====================
+st.title('Bike Sharing Dashboard 🚲')
+st.markdown('Analisis data peminjaman sepeda periode 2011-2012')
 
+# =====================
+# OVERVIEW
+# =====================
 st.subheader('Overview')
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -70,8 +62,9 @@ with col3:
 
 st.markdown('---')
 
-
-# VISUALISASI 1
+# =====================
+# VISUALISASI 1 - Pengaruh Cuaca
+# =====================
 st.subheader('Pertanyaan 1: Pengaruh Kondisi Cuaca Terhadap Peminjaman Sepeda')
 
 weather_avg = df_filtered.groupby('weather_condition', observed=True)['total_rentals'].mean().reset_index()
@@ -93,8 +86,9 @@ st.pyplot(fig1)
 
 st.markdown('---')
 
-
-# VISUALISASI 2 
+# =====================
+# VISUALISASI 2 - Pengaruh Musim
+# =====================
 st.subheader('Pertanyaan 2: Pengaruh Musim Terhadap Peminjaman Sepeda')
 
 season_avg = df_filtered.groupby('season', observed=True)['total_rentals'].mean().reset_index()
@@ -116,9 +110,10 @@ st.pyplot(fig2)
 
 st.markdown('---')
 
-
-# VISUALISASI 3 
-st.subheader('Pertanyaan 3: Rata-rata Peminjaman Hari Kerja dengan Hari Libur')
+# =====================
+# VISUALISASI 3 - Hari Kerja vs Libur
+# =====================
+st.subheader('Pertanyaan 3: Rata-rata Peminjaman Hari Kerja vs Hari Libur')
 
 workingday_avg = df_filtered.groupby('workingday', observed=True)['total_rentals'].mean().reset_index()
 workingday_avg['workingday'] = workingday_avg['workingday'].map({
@@ -143,7 +138,9 @@ st.pyplot(fig3)
 
 st.markdown('---')
 
+# =====================
 # VISUALISASI 4 - Tren Bulanan
+# =====================
 st.subheader('Pertanyaan 4: Tren Total Peminjaman Sepeda per Bulan (2011 vs 2012)')
 
 monthly_trend = df_filtered.groupby(['year', 'month'], observed=True)['total_rentals'].sum().reset_index()
@@ -167,14 +164,10 @@ st.pyplot(fig4)
 
 st.markdown('---')
 
-
+# =====================
 # VISUALISASI 5 - Clustering Kategori Waktu
+# =====================
 st.subheader('Analisis Lanjutan: Rata-rata Peminjaman Berdasarkan Kategori Waktu')
-
-df_hour_filtered = df_hour[
-    (df_hour['date'] >= pd.Timestamp(start_date)) &
-    (df_hour['date'] <= pd.Timestamp(end_date))
-]
 
 bins_hour = [0, 6, 11, 15, 19, 23]
 labels_hour = ['Dini Hari', 'Pagi', 'Siang', 'Sore', 'Malam']
