@@ -3,18 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# =====================
-# LOAD DATA
-# =====================
 df_day = pd.read_csv('day_clean.csv')
 df_hour = pd.read_csv('hour_clean.csv')
 
 df_day['date'] = pd.to_datetime(df_day['date'])
 df_hour['date'] = pd.to_datetime(df_hour['date'])
 
-# =====================
 # SIDEBAR
-# =====================
 min_date = df_day['date'].min()
 max_date = df_day['date'].max()
 
@@ -28,14 +23,14 @@ with st.sidebar:
         value=[min_date, max_date]
     )
     
-# Tambahkan filter musim
+# Filter musim
 season_options = ['Semua'] + list(df_day['season'].unique())
 selected_season = st.selectbox('Pilih Musim', season_options)
 
 start_date = pd.Timestamp(date_input[0])
 end_date = pd.Timestamp(date_input[1]) if len(date_input) > 1 else pd.Timestamp(max_date)
 
-# Filter berdasarkan tanggal
+# Filter tanggal
 df_filtered = df_day[
     (df_day['date'] >= start_date) &
     (df_day['date'] <= end_date)
@@ -50,15 +45,11 @@ df_hour_filtered = df_hour[
 if selected_season != 'Semua':
     df_filtered = df_filtered[df_filtered['season'] == selected_season]
 
-# =====================
 # JUDUL DASHBOARD
-# =====================
-st.title('Bike Sharing Dashboard 🚲')
+st.title('Bike Sharing Dashboard ')
 st.markdown('Analisis data peminjaman sepeda periode 2011-2012')
 
-# =====================
 # OVERVIEW
-# =====================
 st.subheader('Overview')
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -70,9 +61,8 @@ with col3:
 
 st.markdown('---')
 
-# =====================
+
 # VISUALISASI 1 - Pengaruh Cuaca
-# =====================
 st.subheader('Pertanyaan 1: Pengaruh Kondisi Cuaca Terhadap Peminjaman Sepeda')
 
 weather_avg = df_filtered.groupby('weather_condition', observed=True)['total_rentals'].mean().reset_index()
@@ -94,9 +84,8 @@ st.pyplot(fig1)
 
 st.markdown('---')
 
-# =====================
+
 # VISUALISASI 2 - Pengaruh Musim
-# =====================
 st.subheader('Pertanyaan 2: Pengaruh Musim Terhadap Peminjaman Sepeda')
 
 season_avg = df_filtered.groupby('season', observed=True)['total_rentals'].mean().reset_index()
@@ -118,9 +107,8 @@ st.pyplot(fig2)
 
 st.markdown('---')
 
-# =====================
-# VISUALISASI 3 - Hari Kerja vs Libur
-# =====================
+
+# VISUALISASI 3 - Hari Kerja dengan Hari Libur
 st.subheader('Pertanyaan 3: Rata-rata Peminjaman Hari Kerja vs Hari Libur')
 
 workingday_avg = df_filtered.groupby('workingday', observed=True)['total_rentals'].mean().reset_index()
@@ -146,9 +134,8 @@ st.pyplot(fig3)
 
 st.markdown('---')
 
-# =====================
+
 # VISUALISASI 4 - Tren Bulanan
-# =====================
 st.subheader('Pertanyaan 4: Tren Total Peminjaman Sepeda per Bulan (2011 vs 2012)')
 
 monthly_trend = df_filtered.groupby(['year', 'month'], observed=True)['total_rentals'].sum().reset_index()
@@ -172,9 +159,8 @@ st.pyplot(fig4)
 
 st.markdown('---')
 
-# =====================
+
 # VISUALISASI 5 - Clustering Kategori Waktu
-# =====================
 st.subheader('Analisis Lanjutan: Rata-rata Peminjaman Berdasarkan Kategori Waktu')
 
 bins_hour = [0, 6, 11, 15, 19, 23]
