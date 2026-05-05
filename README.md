@@ -16,4 +16,5 @@ pipenv shell
 pip install -r requirements.txt
 
 ## Cara Menjalankan Dashboard
-jalankan streamlit di terminal, "streamlit run dashboard.py"
+cd folder dashboard
+jalankan streamlit di terminal, "streamlit run dashboard/dashboard.py"
